@@ -11,7 +11,7 @@ public abstract class Resp {
     //Redis Integer
     //Bulk String
     //Resp Array
-    public static Resp decoder(ByteBuf buffer){
+    public static Resp decode(ByteBuf buffer){
         //判断是不是完整的命令
         if(buffer.readableBytes() < 0){
             throw new RuntimeException("没有完整的命令");
@@ -19,20 +19,41 @@ public abstract class Resp {
         //拿到符号解析
         char c = (char)buffer.readByte();
         switch (c){
-            case "+":
+            case '+':
                 return new SimpleString(getString(buffer));
-            case "-":
+            case '-':
                 return new Errors(getString(buffer));
-            case ":":
+            case ':':
                 return new RespInteger(getNumber(buffer));
-            case "$":
-                return null;
-            case "*":
-                return null;
+            case '$':
+                int length = getNumber(buffer);
+                if(buffer.readableBytes()<length+2){
+                    throw new IllegalStateException("没有完整的命令");
+                }
+
+                byte[] content;
+                if(length == -1){
+                    return null;
+                }else {
+                    content = new byte[length];
+                    buffer.readBytes(content);
+                }
+                if(buffer.readByte() != '\r' || buffer.readByte() != '\n'){
+                    throw new IllegalStateException("没有完整的命令");
+                }
+
+                return new BulkString(content);
+            case '*':
+                int number = getNumber(buffer);
+                Resp [] array = new Resp[number];
+                for(int i = 0; i < number; i++){
+                    array[i] = decode(buffer);
+                }
+                return new RespArray(array);
+            default:
+                throw new RuntimeException("未知的命令");
         }
         //解析
-
-        return null;
     }
 
     public abstract void encoder(Resp resp, ByteBuf byteBuf);

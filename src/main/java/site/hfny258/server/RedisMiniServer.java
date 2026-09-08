@@ -12,7 +12,13 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import lombok.extern.slf4j.Slf4j;
+import site.hfny258.server.Handler.RespCommandHandler;
+import site.hfny258.server.Handler.RespDecoder;
+import site.hfny258.server.Handler.RespEncoder;
 import site.hfny258.server.Handler.StringHandler;
+import site.hfny258.server.core.RedisCore;
+import site.hfny258.server.core.RedisCoreImpl;
+
 @Slf4j
 public class RedisMiniServer implements RedisServer{
     private  String host;
@@ -20,12 +26,14 @@ public class RedisMiniServer implements RedisServer{
     private EventLoopGroup bossGroup;
     private EventLoopGroup workGroup;
     private Channel severChannel;
+    private RedisCore redisCore;
 
     public RedisMiniServer(int port, String host){
         this.port = port;
         this.host = host;
         this.bossGroup = new NioEventLoopGroup(1);
         this.workGroup = new NioEventLoopGroup(4);
+        this.redisCore = new RedisCoreImpl();
 
     }
 
@@ -39,9 +47,9 @@ public class RedisMiniServer implements RedisServer{
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new StringDecoder());
-                        pipeline.addLast(new StringHandler());
-                        pipeline.addLast(new StringEncoder());
+                        pipeline.addLast(new RespDecoder());
+                        pipeline.addLast(new RespCommandHandler(redisCore));
+                        pipeline.addLast(new RespEncoder());
                     }
                 });
         try {
