@@ -21,6 +21,7 @@ import site.hfny258.server.core.RedisCoreImpl;
 
 @Slf4j
 public class RedisMiniServer implements RedisServer{
+    private static final int DEFAULT_DBCOUNT = 16;
     private  String host;
     private  int port;
     private EventLoopGroup bossGroup;
@@ -33,7 +34,7 @@ public class RedisMiniServer implements RedisServer{
         this.host = host;
         this.bossGroup = new NioEventLoopGroup(1);
         this.workGroup = new NioEventLoopGroup(4);
-        this.redisCore = new RedisCoreImpl();
+        this.redisCore = new RedisCoreImpl(DEFAULT_DBCOUNT);
 
     }
 

@@ -70,21 +70,25 @@ public abstract class Resp {
         return result.toString();
     }
 
-    static int getNumber(ByteBuf buffer){
-        char c;
-        c = (char)buffer.readByte();
-        boolean positive = true;
-        int value = 0;
-        if(c == '-'){
-            positive = false;
-        }else {
-            value = c - '0';
-        }while((c = (char)buffer.readByte()) != '\n' && buffer.readableBytes()>0){
-            value = value * 10 + (c - '0');
+    static int getNumber(ByteBuf buffer) {
+        int start = buffer.readerIndex();
+        int end = buffer.writerIndex();
+
+        for (int i = start; i + 1 < end; i++) {
+            if (buffer.getByte(i) == '\r'
+                    && buffer.getByte(i + 1) == '\n') {
+
+                String value = buffer.toString(
+                        start,
+                        i - start,
+                        java.nio.charset.StandardCharsets.US_ASCII
+                );
+
+                buffer.readerIndex(i + 2);
+                return Integer.parseInt(value);
+            }
         }
-        if(buffer.readableBytes()<=0 || buffer.readableBytes() != '\n'){
-            throw new IllegalStateException("没有找到换行符");
-        }
-        return positive ? value : -value;
+
+        throw new IllegalStateException("RESP数字数据不完整");
     }
 }
