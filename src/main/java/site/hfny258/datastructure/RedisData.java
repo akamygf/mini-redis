@@ -1,5 +1,6 @@
 package site.hfny258.datastructure;
 
-public class RedisData {
-
+public interface RedisData {
+    long timeout();
+    void setTimeout(long timeout);
 }

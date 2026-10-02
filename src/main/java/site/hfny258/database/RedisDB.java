@@ -3,6 +3,7 @@ package site.hfny258.database;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import site.hfny258.datastructure.RedisBytes;
 import site.hfny258.datastructure.RedisData;
 import site.hfny258.internal.Dict;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 @Setter
 @Slf4j
 public class RedisDB {
-    private final Dict<byte[], RedisData> data;
+    private final Dict<RedisBytes, RedisData> data;
 
     private final int id;
 
@@ -21,23 +22,23 @@ public class RedisDB {
         this.data = new Dict<>();
     }
 
-    public Set<byte[]> keys() {
+    public Set<RedisBytes> keys() {
         return data.keySet();
     }
 
-    public boolean exists(byte[] key) {
+    public boolean exists(RedisBytes key) {
         return data.containsKey(key);
     }
 
-    public void put(byte[] key, RedisData value) {
+    public void put(RedisBytes key, RedisData value) {
         data.put(key, value);
     }
 
-    public RedisData get(byte[] key) {
+    public RedisData get(RedisBytes key) {
         return data.get(key);
     }
 
-    public void remove(byte[] key) {
+    public void remove(RedisBytes key) {
         data.remove(key);
     }
 

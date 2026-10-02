@@ -1,6 +1,7 @@
 package site.hfny258.server.core;
 
 import site.hfny258.database.RedisDB;
+import site.hfny258.datastructure.RedisBytes;
 import site.hfny258.datastructure.RedisData;
 
 import java.util.List;
@@ -21,14 +22,14 @@ public class RedisCoreImpl implements RedisCore{
     }
 
     @Override
-    public Set<byte[]> key() {
+    public Set<RedisBytes> keys() {
         int dbIndex = getCurrentDBIndex();
         RedisDB redisDB = database.get(dbIndex);
         return redisDB.keys();
     }
 
     @Override
-    public void put(byte[] key, RedisData value) {
+    public void put(RedisBytes key, RedisData value) {
         int dbIndex = getCurrentDBIndex();
         RedisDB redisDB = database.get(dbIndex);
         redisDB.put(key, value);
@@ -36,7 +37,7 @@ public class RedisCoreImpl implements RedisCore{
     }
 
     @Override
-    public RedisData get(byte[] key) {
+    public RedisData get(RedisBytes key) {
         int dbIndex = getCurrentDBIndex();
         RedisDB redisDB = database.get(dbIndex);
         if(redisDB.exists(key)){
@@ -46,7 +47,7 @@ public class RedisCoreImpl implements RedisCore{
     }
 
     @Override
-    public void remove(byte[] key) {
+    public void remove(RedisBytes key) {
         int dbIndex = getCurrentDBIndex();
         RedisDB redisDB = database.get(dbIndex);
         redisDB.remove(key);

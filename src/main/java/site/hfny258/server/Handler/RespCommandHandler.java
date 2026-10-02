@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import site.hfny258.command.Command;
 import site.hfny258.command.CommandType;
+import site.hfny258.datastructure.RedisBytes;
 import site.hfny258.protocal.BulkString;
 import site.hfny258.protocal.Errors;
 import site.hfny258.protocal.Resp;
@@ -39,8 +40,8 @@ public class RespCommandHandler extends SimpleChannelInboundHandler<Resp> {
 
         try{
             Resp[] array = respArray.getContent();
-            String commandName = new String(((BulkString)array[0]).getContent());
-            commandName = commandName.toUpperCase();
+            RedisBytes cmd = ((BulkString) array[0]).getContent();
+            String commandName = cmd.getString().toUpperCase();
             CommandType commandType;
 
             try {
